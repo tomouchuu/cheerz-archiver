@@ -2,7 +2,7 @@
 
 ## Puppeter Script to Download from Cheerz
 
-(Tampermonkey version available at X)
+(Tampermonkey version available at https://github.com/tomouchuu/cheerz-archiver/tree/main/tampermonkey)
 
 ### Install / Run
 
