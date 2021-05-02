@@ -12,5 +12,4 @@
 
 ### TODO
 
-- Date should be nicely formatted
 - Ability to pass through the url you want

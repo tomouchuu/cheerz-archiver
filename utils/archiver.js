@@ -1,5 +1,6 @@
-const fetch = require('node-fetch');
 const path = require('path');
+const {format, parse} = require('date-fns');
+const fetch = require('node-fetch');
 const metadataWriter = require("write-aac-metadata").default;
 
 const checkFileExists = require('./check-file-exists');
@@ -17,7 +18,9 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   const itemModal = await item.$('a.modal');
   const itemHref = await itemModal.evaluate((node) => node.getAttribute('href'));
   const itemId = await item.evaluate((node) => node.getAttribute('data-item-id'));
-  const itemPosted = await item.evaluate((node) => node.getAttribute('data-posted-time'));
+  const itemPostedStr = await item.evaluate((node) => node.getAttribute('data-posted-time'));
+
+  const itemPosted = format(parse((itemPostedStr * 1000), 'T', new Date()), 'yyyy-MM-dd_HH-mm-ss');
   returnObj.itemId = itemId;
   returnObj.itemPosted = itemPosted;
 
