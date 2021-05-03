@@ -120,13 +120,11 @@ const App = () => {
       }
     ]);
     setDownloading(true);
-    for (i in items) {
+    for (let i = 0; i < items.length; i++) {
       const item = await archiver(items[i], name, cheerzUrl, downloadDir, browser);
       if (item.imgSaved) {
         setCompleteItems(lastCompletedItemNumber => lastCompletedItemNumber + 1);
       }
-      
-      // if (i >= 1) break;
     }
   
     browser.close();
