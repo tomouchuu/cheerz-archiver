@@ -1,6 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Release
 
 on:
@@ -13,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
     - uses: actions/checkout@v2
     - uses: c-hive/gha-npm-cache@v1
     - name: Install pkg global
