@@ -26,7 +26,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: windows
-        files: dist/cheerz-archiver.exe
+        path: dist/cheerz-archiver.exe
   build-mac:
     runs-on: macos-latest
     steps:
@@ -47,9 +47,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: macos
-        files: dist/cheerz-archiver
+        path: dist/cheerz-archiver
   release:
     runs-on: ubuntu-latest
+    needs: [build-windows, build-mac]
     steps:
     - name: Get windows release
       uses: actions/download-artifact@v2
