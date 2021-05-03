@@ -49,6 +49,7 @@ jobs:
         name: macos
         files: dist/cheerz-archiver
   release:
+    runs-on: ubuntu-latest
     steps:
     - name: Get windows release
       uses: actions/download-artifact@v2
