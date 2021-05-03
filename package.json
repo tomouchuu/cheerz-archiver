@@ -1,6 +1,6 @@
 {
   "name": "cheerz-archiver",
-  "version": "0.2.2-beta",
+  "version": "0.2.3-beta",
   "description": "",
   "bin": "cli.js",
   "scripts": {

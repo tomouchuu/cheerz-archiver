@@ -51,15 +51,15 @@ jobs:
   release:
     steps:
     - name: Get windows release
-        uses: actions/download-artifact@v2
-        with:
-          name: windows
-          path: dist/
+      uses: actions/download-artifact@v2
+      with:
+        name: windows
+        path: dist/
     - name: Get macos release
-        uses: actions/download-artifact@v2
-        with:
-          name: macos
-          path: dist/
+      uses: actions/download-artifact@v2
+      with:
+        name: macos
+        path: dist/
     - name: Create release
       uses: softprops/action-gh-release@v1
       with:
