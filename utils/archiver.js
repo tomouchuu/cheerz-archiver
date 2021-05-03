@@ -30,6 +30,10 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
 
   // Get the modal showing
   const modalPage = await browser.newPage();
+  await modalPage.setViewport({
+    width: 1920,
+    height: 1080
+  });
   await modalPage.goto(`${cheerzUrl}${itemHref}`);
 
   // Get audio
@@ -64,7 +68,7 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   const photoDone = await checkFileExists(photoPath);
   if (audioDone && photoDone) {
     // Write metadata to the audio
-    await metadataWriter(
+    const metadata = await metadataWriter(
       audioPath,
       {
         title: itemPosted,

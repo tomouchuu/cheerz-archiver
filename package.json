@@ -2,20 +2,39 @@
   "name": "cheerz-archiver",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "bin": "cli.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node main.js",
+    "build:cli": "npx babel app.js -o cli.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chrome-finder": "^1.0.7",
     "date-fns": "^2.21.1",
+    "import-jsx": "^4.0.0",
+    "ink": "^3.0.8",
+    "ink-big-text": "^1.2.0",
+    "ink-spinner": "^4.0.1",
+    "ink-text-input": "^4.0.1",
     "node-fetch": "^2.6.1",
-    "puppeteer": "^9.0.0",
-    "puppeteer-extra": "^3.1.18",
-    "puppeteer-extra-plugin-anonymize-ua": "^2.2.17",
-    "puppeteer-extra-plugin-stealth": "^2.7.8",
+    "puppeteer-core": "^9.0.0",
+    "react": "^17.0.2",
     "write-aac-metadata": "^1.0.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.0",
+    "@babel/preset-react": "^7.13.13"
+  },
+  "pkg": {
+    "scripts": "utils/**/*.js",
+    "outputPath": "dist",
+    "targets": [
+      "node14-win-x64",
+      "node14-macos-x64"
+    ]
   }
 }
