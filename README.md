@@ -12,4 +12,4 @@
 
 ### TODO
 
-- Ability to pass through the url you want
+- Bundle FFMPEG into the pkg

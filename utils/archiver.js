@@ -67,16 +67,17 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   const audioDone = await checkFileExists(audioPath);
   const photoDone = await checkFileExists(photoPath);
   if (audioDone && photoDone) {
-    // Write metadata to the audio
-    const metadata = await metadataWriter(
-      audioPath,
-      {
-        title: itemPosted,
-        artist: name,
-        album: 'CHEERZ',
-        coverPicturePath: photoPath
-      }
-    );
+    // FIXME: FFMPEG is not being included in the build, so this will fail
+    // // Write metadata to the audio
+    // const metadata = await metadataWriter(
+    //   audioPath,
+    //   {
+    //     title: itemPosted,
+    //     artist: name,
+    //     album: 'CHEERZ',
+    //     coverPicturePath: photoPath
+    //   }
+    // );
 
     // Close the modal
     await modalPage.waitForTimeout(2000);
