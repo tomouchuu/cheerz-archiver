@@ -6,9 +6,8 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  build-windows:
+    runs-on: windows-latest
     steps:
     - uses: actions/setup-node@v1
       with:
@@ -22,7 +21,45 @@ jobs:
     - name: Build the CLI
       run: npm run build:cli
     - name: Package the CLI
-      run: pkg .
+      run: pkg . --target node14-win-x64
+    - name: Archive win release
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows
+        files: dist/cheerz-archiver.exe
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+    - uses: actions/checkout@v2
+    - uses: c-hive/gha-npm-cache@v1
+    - name: Install pkg global
+      run: npm i -g pkg
+    - name: Install JS dependencies
+      run: npm i
+    - name: Build the CLI
+      run: npm run build:cli
+    - name: Package the CLI
+      run: pkg . --target node14-macos-x64
+    - name: Archive mac release
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos
+        files: dist/cheerz-archiver
+  release:
+    steps:
+    - name: Get windows release
+        uses: actions/download-artifact@v2
+        with:
+          name: windows
+          path: dist/
+    - name: Get macos release
+        uses: actions/download-artifact@v2
+        with:
+          name: macos
+          path: dist/
     - name: Create release
       uses: softprops/action-gh-release@v1
       with:
