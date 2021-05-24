@@ -10,17 +10,19 @@ const setupDirs = require('./utils/setup-dirs');
 const React = require('react');
 const {render, useApp, Box, Text, Newline, Static} = require('ink');
 const BigText = require('ink-big-text');
-const UncontrolledTextInput = require('ink-text-input').UncontrolledTextInput;
+const {UncontrolledTextInput} = require('ink-text-input');
 const Spinner = require('ink-spinner').default;
 
 const App = () => {
   const {exit} = useApp();
   const [logs, setLogs] = React.useState([]);
   const [chromeDownloaded, setChromeDownloaded] = React.useState(false);
+  const [cheerzUrl, setCheerzUrl] = React.useState('');
   const [archiving, setArchiving] = React.useState(false);
   const [downloading, setDownloading] = React.useState(false);
   const [totalItems, setTotalItems] = React.useState(0);
-  const [completeItems, setCompleteItems] = React.useState(0);
+  const [completeAudioItems, setCompleteAudioItems] = React.useState(0);
+  const [completeImgItems, setCompleteImgItems] = React.useState(0);
 
   React.useEffect(() => {
     const userChromePath = findChrome();
@@ -30,19 +32,24 @@ const App = () => {
     }
   });
 
+  const updateCheerzUrl = cheerzUrl => {
+    setCheerzUrl(cheerzUrl);
+    console.log(`Set url to ${cheerzUrl}`);
+  }
+
   /**
    * handleSubmit
    * The archive process
-   * @param {String} cheerzUrl URL to Cheerz page
+   * @param {Integer} startFrom The Index to start from
    */
-  const handleSubmit = async cheerzUrl => {
+  const handleSubmit = async startFrom => {
     setArchiving(true);
     setLogs(previousLogs => [
       ...previousLogs,
       {
         key: 'booting',
         color: '',
-        text: 'Opening chromium and navigating to cheerz, please wait'
+        text: 'Opening chrome and navigating to cheerz, please wait'
       }
     ]);
 
@@ -99,19 +106,19 @@ const App = () => {
     const downloadDir = setupDirs(name);
     
     // Start scrolling til you can no more
-    // console.log('Scrolling...');
-    // await autoScroll(page);
+    console.log('Scrolling...');
+    await autoScroll(page);
   
     // Get all the items
     await page.waitForSelector('.item');
     const items = await page.$$('.item');
-    setTotalItems(items.length);
+    setTotalItems((items.length - startFrom));
     setLogs(previousLogs => [
       ...previousLogs,
       {
         key: 'foundItems',
         color: '',
-        text: `Found ${items.length} items`
+        text: `Found a total of ${items.length} items`
       }
     ]);
   
@@ -120,14 +127,18 @@ const App = () => {
       {
         key: 'starting',
         color: 'blue',
-        text: 'Starting to archive, this may take awhile'
+        text: `Starting to archive from item ${startFrom}, this may take awhile`
       }
     ]);
     setDownloading(true);
-    for (let i = 0; i < items.length; i++) {
+    for (let i = startFrom; i < items.length; i++) {
       const item = await archiver(items[i], name, cheerzUrl, downloadDir, browser);
+
+      if (item.audioSaved) {
+        setCompleteAudioItems(lastCompletedAudioNumber => lastCompletedAudioNumber + 1)
+      }
       if (item.imgSaved) {
-        setCompleteItems(lastCompletedItemNumber => lastCompletedItemNumber + 1);
+        setCompleteImgItems(lastCompletedImgNumber => lastCompletedImgNumber + 1);
       }
     }
   
@@ -154,11 +165,19 @@ const App = () => {
                 </Text>
               </>
             )}
-            {chromeDownloaded && (
+            {!cheerzUrl && chromeDownloaded && (
               <>
                 <Text>To start, enter the url for the idol:</Text>
                 <Newline />
-                <UncontrolledTextInput onSubmit={handleSubmit} placeholder="eg. https://cheerz.cz/artist/..." />
+                <UncontrolledTextInput onSubmit={updateCheerzUrl} placeholder="eg. https://cheerz.cz/artist/..." />
+              </>
+            )}
+            {chromeDownloaded && cheerzUrl !== '' && (
+              <>
+                <Newline />
+                <Text>Next where should I start from (0 is 1st):</Text>
+                <Newline />
+                <UncontrolledTextInput onSubmit={handleSubmit} placeholder="0" />
               </>
             )}
           </Text>
@@ -180,12 +199,12 @@ const App = () => {
                   <Spinner type="dots" />
                 </Text>
               </Box>
-              <Text>Archived {completeItems} / {totalItems}</Text>
+              <Text>Archived {completeImgItems} images and {completeAudioItems} audios of {totalItems}</Text>
             </>
           )}
         </Box>
       )}
-      {archiving && downloading && completeItems === totalItems && (
+      {archiving && downloading && completeImgItems === totalItems && (
         <Box>
           <Text>
             <BigText text="4946" align="center" />
