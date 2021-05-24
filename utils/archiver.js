@@ -51,6 +51,20 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
     }
   });
 
+  // Handle unsupported items (mail magazines)
+  await modalPage.waitForSelector(`#item-${itemId}.overlay #itemCheerCount${itemId}.cheerCount`); 
+  if (modalPage.$(`#item-${itemId}.overlay #itemCheerCount${itemId}.cheerCount.magazine`)) {
+    // Close the modal
+    await modalPage.waitForTimeout(2000);
+    await modalPage.close();
+
+    console.log(`Item ${cheerzUrl}${itemHref} was a mail magazine, there is no way to archive mail magazine items, sorry ; ;`);
+    returnObj.imgSaved = true;
+
+    // Wait to move onto the next item
+    setTimeout(() => resolve(returnObj), 3000);
+  }
+
   // Get image
   await modalPage.waitForSelector(`#item-${itemId}.overlay .article .photo img`);
   const imgSrc = await modalPage.$eval(`#item-${itemId}.overlay .article .photo img`, (el) => el.getAttribute('src'));
