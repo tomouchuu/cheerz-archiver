@@ -1,3 +1,4 @@
+const { intercept, patterns } = require('puppeteer-interceptor');
 const path = require('path');
 const {format, parse} = require('date-fns');
 const fetch = require('node-fetch');
@@ -37,11 +38,11 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   await modalPage.goto(`${cheerzUrl}${itemHref}`);
 
   // Get audio
-  modalPage.on('response', async response => {
-    if (response.url() === 'https://cheerz.cz/ajax/voice-url') {
-      const audioRes = await response.json();
+  intercept(modalPage, patterns.XHR('https://cheerz.cz/ajax/voice-url'), {
+    onResponseReceived: event => {
+      const audioRes = JSON.parse(event.response.body);
       const audioSrc = audioRes.Result.voice_url;
-      await fetch(audioSrc)
+      fetch(audioSrc)
         .then(x => x.arrayBuffer())
         .then(x => {
           writeFileAsync(audioPath, Buffer.from(x));

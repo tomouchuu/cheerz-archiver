@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer-core');
+const { intercept, patterns } = require('puppeteer-interceptor');
 const findChrome = require('chrome-finder');
 let chromePath;
 
@@ -76,6 +77,9 @@ const App = () => {
       }
     ]);
     await page.waitForNavigation();
+
+    // Block voice urls so we can access them later?
+    intercept(page, patterns.XHR('https://cheerz.cz/ajax/voice-url'), {});
   
     // Go to the idol's cheerz page
     setLogs(previousLogs => [
