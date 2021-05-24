@@ -43,6 +43,8 @@ const App = () => {
    * @param {Integer} startFrom The Index to start from
    */
   const handleSubmit = async startFrom => {
+    if (startFrom === '') startFrom = 0;
+
     setArchiving(true);
     setLogs(previousLogs => [
       ...previousLogs,
@@ -177,7 +179,7 @@ const App = () => {
                 <Newline />
                 <Text>Next where should I start from (0 is 1st):</Text>
                 <Newline />
-                <UncontrolledTextInput onSubmit={handleSubmit} placeholder="0" />
+                <UncontrolledTextInput onSubmit={handleSubmit} placeholder="Defaults to 0" />
               </>
             )}
           </Text>
