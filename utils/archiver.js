@@ -92,6 +92,17 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
 
     // Wait to move onto the next item
     setTimeout(() => resolve(returnObj), 3000);
+  } else if (photoDone) {
+    // Close the modal
+    await modalPage.waitForTimeout(2000);
+    await modalPage.close();
+
+    console.log(`Audio was not saved for ${cheerzUrl}${itemHref}, does it have a voice?`);
+
+    // Wait to move onto the next item
+    setTimeout(() => resolve(returnObj), 3000);
+  } else {
+    console.log('There has been an error, please restart from the last completed number');
   }
 });
 
