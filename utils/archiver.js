@@ -63,11 +63,17 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
         });
   }
 
+  // Check the audio actually exists
+  let audioPresent = false;
+  if (modalPage.$(`#item-${itemId}.overlay #cheerArea${itemId} .voiceBtn`)) {
+    audioPresent = true;
+  }
+
   // Wait for everything to finish downloading
   await modalPage.waitForTimeout(5000);
   const audioDone = await checkFileExists(audioPath);
   const photoDone = await checkFileExists(photoPath);
-  if (audioDone && photoDone) {
+  if ((audioPresent && audioDone) && photoDone) {
     // FIXME: FFMPEG is not being included in the build, so this will fail
     // // Write metadata to the audio
     // const metadata = await metadataWriter(
