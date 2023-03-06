@@ -2,10 +2,12 @@ const { intercept, patterns } = require('puppeteer-interceptor');
 const path = require('path');
 const {format, parse} = require('date-fns');
 const fetch = require('node-fetch');
-const metadataWriter = require("write-aac-metadata").default;
+// const metadataWriter = require("write-aac-metadata").default;
 
 const checkFileExists = require('./check-file-exists');
 const writeFileAsync = require('./write-file-async');
+
+const urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/;
 
 const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(async(resolve) => {
   const returnObj = {
@@ -52,8 +54,14 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   });
 
   // Handle unsupported items (mail magazines)
-  await modalPage.waitForSelector(`#item-${itemId}.overlay #itemCheerCount${itemId}.cheerCount`); 
-  if (modalPage.$(`#item-${itemId}.overlay #itemCheerCount${itemId}.cheerCount.magazine`)) {
+  let isMagazine = false;
+  try {
+    await modalPage.$(`#item-${itemId}.overlay #itemCheerCount${itemId}.cheerCount.magazine`);
+  } catch {
+    isMagazine = true;
+  }
+
+  if (isMagazine) {
     // Close the modal
     await modalPage.waitForTimeout(2000);
     await modalPage.close();
@@ -66,8 +74,21 @@ const archiver = (item, name, cheerzUrl, downloadDir, browser) => new Promise(as
   }
 
   // Get image
-  await modalPage.waitForSelector(`#item-${itemId}.overlay .article .photo img`);
-  const imgSrc = await modalPage.$eval(`#item-${itemId}.overlay .article .photo img`, (el) => el.getAttribute('src'));
+  let imgSrc = '';
+
+  try {
+    await modalPage.waitForSelector(`#item-${itemId}.overlay .article .photo img`, { timeout: 5000 });
+    imgSrc = await modalPage.$eval(`#item-${itemId}.overlay .article .photo img`, (el) => el.getAttribute('src'));
+  } catch {
+    console.log('Could not find an image, maybe supporter only?');
+  }
+
+  if (modalPage.$(`#item-${itemId}.overlay .article .supporterOnly`)) {
+    console.log(`Item ${cheerzUrl}${itemHref} is for supporters only. Getting the blurred image`);
+    const supportStyleAttr = await modalPage.$eval(`#item-${itemId}.overlay .article .supporterOnly`, (el) => el.getAttribute('style'));
+    imgSrc = supportStyleAttr.match(urlRegex)[0];
+  }
+  
   if (imgSrc !== '') {
     await fetch(imgSrc)
         .then(x => x.arrayBuffer())
